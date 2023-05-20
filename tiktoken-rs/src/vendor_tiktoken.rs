@@ -600,6 +600,26 @@ impl CoreBPE {
         self.split_by_token_iter(text, use_special_tokens).collect()
     }
 
+    pub fn split_by_tokens<'a>(
+        &'a self,
+        tokens: Vec<usize>,
+        use_special_tokens: bool,
+    ) -> Result<Vec<String>> {
+        self.split_by_tokens_iter(tokens, use_special_tokens)
+            .collect()
+    }
+
+    pub fn split_by_tokens_iter<'a>(
+        &'a self,
+        tokens: Vec<usize>,
+        use_special_tokens: bool,
+    ) -> impl Iterator<Item = Result<String>> + 'a {
+        self._decode_native_and_split(tokens).map(|token|
+                // Map each token to a Result<String>
+                String::from_utf8(token)
+                .map_err(|e| anyhow!(e.to_string())))
+    }
+
     /// Iterator for decoding and splitting a String.
     /// See `split_by_token` for more details.
     pub fn split_by_token_iter<'a>(

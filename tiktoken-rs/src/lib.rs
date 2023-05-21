@@ -1,4 +1,5 @@
 #![doc = include_str!("../README.md")]
+#![feature(slice_pattern)]
 mod api;
 mod singleton;
 mod tiktoken_ext;

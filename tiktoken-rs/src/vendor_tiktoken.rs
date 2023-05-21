@@ -1,6 +1,7 @@
 // This check is new and seems buggy (possibly with PyO3 interaction)
 #![allow(clippy::borrow_deref_ref)]
 
+use core::slice::SlicePattern;
 use std::collections::HashSet;
 use std::thread;
 
@@ -614,14 +615,9 @@ impl CoreBPE {
         tokens: Vec<usize>,
         use_special_tokens: bool,
     ) -> impl Iterator<Item = Result<String>> + 'a {
-        self._decode_native_and_split(tokens).map(|token| {
-            // Map each token to a Result<String>
-            let a = token.clone();
-            String::from_utf8(token).map_err(|e| {
-                println!("error token: {:#?}", a);
-                anyhow!(e.to_string())
-            })
-        })
+        self._decode_native_and_split(tokens).map(|token|
+                // Map each token to a Result<String>
+                Ok(String::from_utf8_lossy(token.as_slice()).into_owned()))
     }
 
     /// Iterator for decoding and splitting a String.
